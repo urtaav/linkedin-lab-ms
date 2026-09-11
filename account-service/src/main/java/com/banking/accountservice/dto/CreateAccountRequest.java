@@ -23,6 +23,9 @@ public class CreateAccountRequest {
     @Email(message = "Invalid email format")
     private String email;
 
+    @NotBlank(message = "Password is required")
+    private String password;
+
     @NotBlank(message = "Phone is required")
     private String phone;
 

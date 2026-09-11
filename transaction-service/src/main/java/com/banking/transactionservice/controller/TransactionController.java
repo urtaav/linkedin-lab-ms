@@ -1,8 +1,11 @@
 package com.banking.transactionservice.controller;
 
+import com.banking.transactionservice.dto.AccountStatementResponse;
 import com.banking.transactionservice.dto.TransactionResponse;
 import com.banking.transactionservice.dto.TransferRequest;
 import com.banking.transactionservice.service.TransactionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,11 +19,12 @@ import java.util.List;
 @RequestMapping("/api/v1/transactions")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "Transactions", description = "Transaction management endpoints")
 public class TransactionController {
 
     private final TransactionService transactionService;
 
-    // Transfer money between accounts
+    @Operation(summary = "Transfer money between accounts")
     @PostMapping("/transfer")
     public ResponseEntity<TransactionResponse> transfer(
             @Valid @RequestBody TransferRequest request) {
@@ -28,7 +32,7 @@ public class TransactionController {
                 .body(transactionService.transfer(request));
     }
 
-    // Get transaction by ID
+    @Operation(summary = "Get transaction by ID")
     @GetMapping("/{transactionId}")
     public ResponseEntity<TransactionResponse> getTransaction(
             @PathVariable String transactionId) {
@@ -36,7 +40,7 @@ public class TransactionController {
                 transactionService.getTransaction(transactionId));
     }
 
-    // Get transaction history for account
+    @Operation(summary = "Get transaction history for an account")
     @GetMapping("/account/{accountNumber}")
     public ResponseEntity<List<TransactionResponse>> getHistory(
             @PathVariable String accountNumber) {
@@ -44,7 +48,7 @@ public class TransactionController {
                 transactionService.getTransactionHistory(accountNumber));
     }
 
-
+    @Operation(summary = "Verify OTP for a transaction")
     @PostMapping("/{transactionId}/verify")
     public ResponseEntity<TransactionResponse> verifyTransaction(
             @PathVariable String transactionId,
@@ -53,5 +57,13 @@ public class TransactionController {
                 transactionId);
         return ResponseEntity.ok(
                 transactionService.verifyOTP(transactionId, otp));
+    }
+
+    @Operation(summary = "Get full account statement with summary")
+    @GetMapping("/account/{accountNumber}/statement")
+    public ResponseEntity<AccountStatementResponse> getAccountStatement(
+            @PathVariable String accountNumber) {
+        return ResponseEntity.ok(
+                transactionService.getAccountStatement(accountNumber));
     }
 }

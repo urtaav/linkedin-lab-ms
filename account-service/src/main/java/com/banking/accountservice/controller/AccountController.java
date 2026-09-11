@@ -3,6 +3,8 @@ package com.banking.accountservice.controller;
 import com.banking.accountservice.dto.AccountResponse;
 import com.banking.accountservice.dto.CreateAccountRequest;
 import com.banking.accountservice.service.AccountService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,11 +18,12 @@ import java.math.BigDecimal;
 @RequestMapping("/api/v1/accounts")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "Accounts", description = "Account management endpoints")
 public class AccountController {
 
     private final AccountService accountService;
 
-    // Create new bank account
+    @Operation(summary = "Create a new bank account")
     @PostMapping
     public ResponseEntity<AccountResponse> createAccount(
             @Valid @RequestBody CreateAccountRequest request) {
@@ -28,21 +31,28 @@ public class AccountController {
                 .body(accountService.createAccount(request));
     }
 
-    // Get account details
+    @Operation(summary = "Get account details by account number")
     @GetMapping("/{accountNumber}")
     public ResponseEntity<AccountResponse> getAccount(
             @PathVariable String accountNumber) {
         return ResponseEntity.ok(accountService.getAccount(accountNumber));
     }
 
-    // Get account balance
+    @Operation(summary = "Get account balance")
     @GetMapping("/{accountNumber}/balance")
     public ResponseEntity<BigDecimal> getBalance(
             @PathVariable String accountNumber) {
         return ResponseEntity.ok(accountService.getBalance(accountNumber));
     }
 
-    // Block account
+    @Operation(summary = "Get account email")
+    @GetMapping("/{accountNumber}/email")
+    public ResponseEntity<String> getEmail(
+            @PathVariable String accountNumber) {
+        return ResponseEntity.ok(accountService.getEmail(accountNumber));
+    }
+
+    @Operation(summary = "Block an account")
     @PutMapping("/{accountNumber}/block")
     public ResponseEntity<String> blockAccount(
             @PathVariable String accountNumber) {
@@ -50,10 +60,7 @@ public class AccountController {
         return ResponseEntity.ok("Account blocked successfully");
     }
 
-    /**
-     * SAGA STEP 1 — Deduct balance.
-     * Called by Transaction Service when transfer is initiated.
-     */
+    @Operation(summary = "SAGA STEP 1 — Deduct balance (called by Transaction Service)")
     @PutMapping("/{accountNumber}/deduct")
     public ResponseEntity<String> deductBalance(
             @PathVariable String accountNumber,
@@ -62,7 +69,7 @@ public class AccountController {
         return ResponseEntity.ok("Balance deducted successfully");
     }
 
-
+    @Operation(summary = "Credit balance to an account")
     @PutMapping("/{accountNumber}/credit")
     public ResponseEntity<String> creditBalance(
             @PathVariable String accountNumber,

@@ -1,0 +1,3 @@
+com\banking\notificationservice\config\OpenApiConfig.class
+com\banking\notificationservice\config\MailConfig.class
+com\banking\notificationservice\service\EmailService.class

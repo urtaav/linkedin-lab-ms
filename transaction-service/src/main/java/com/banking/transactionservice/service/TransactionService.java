@@ -1,6 +1,7 @@
 package com.banking.transactionservice.service;
 
 import com.banking.transactionservice.client.AccountServiceClient;
+import com.banking.transactionservice.dto.AccountStatementResponse;
 import com.banking.transactionservice.dto.TransactionResponse;
 import com.banking.transactionservice.dto.TransferRequest;
 import com.banking.transactionservice.event.TransactionCompletedEvent;
@@ -15,6 +16,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -148,12 +150,17 @@ public class TransactionService {
 
         transactionRepository.save(transaction);
 
+        // Look up sender email for notification
+        String senderEmail = accountServiceClient.getEmail(
+                transaction.getSenderAccountNumber());
+
         // PUBLISH refund event - Notification service will alert user
         Map<String, Object> refundEvent = new HashMap<>();
         refundEvent.put("transactionId", transaction.getId());
         refundEvent.put("senderAccountNumber", transaction.getSenderAccountNumber());
         refundEvent.put("amount", transaction.getAmount());
         refundEvent.put("reason", reason);
+        refundEvent.put("email", senderEmail);
 
         kafkaTemplate.send(TRANSACTION_REFUNDED_TOPIC, transaction.getId(), refundEvent);
 
@@ -163,11 +170,16 @@ public class TransactionService {
 
     private void blockAccountAndCompensate(Transaction transaction, String reason){
 
+        // Look up sender email for notification
+        String senderEmail = accountServiceClient.getEmail(
+                transaction.getSenderAccountNumber());
+
         // Publish fraud.detected -> Account Service will block account
         Map<String, Object> fraudEvent = new HashMap<>();
         fraudEvent.put("transactionId", transaction.getId());
         fraudEvent.put("accountNumber", transaction.getSenderAccountNumber());
         fraudEvent.put("reason", reason);
+        fraudEvent.put("email", senderEmail);
 
         kafkaTemplate.send(FRAUD_DETECTED_TOPIC, transaction.getSenderAccountNumber(), fraudEvent);
         log.warn("fraud.detected published - account: {} will be blocked, Kindly contact to the bank",
@@ -182,12 +194,20 @@ public class TransactionService {
         transaction.setCompletedAt(LocalDateTime.now());
         transactionRepository.save(transaction);
 
+        // Look up emails for both parties
+        String senderEmail = accountServiceClient.getEmail(
+                transaction.getSenderAccountNumber());
+        String receiverEmail = accountServiceClient.getEmail(
+                transaction.getReceiverAccountNumber());
+
         TransactionCompletedEvent completedEvent = new TransactionCompletedEvent(
                 transaction.getId(),
                 transaction.getSenderAccountNumber(),
                 transaction.getReceiverAccountNumber(),
                 transaction.getAmount(),
-                transaction.getDescription()
+                transaction.getDescription(),
+                senderEmail,
+                receiverEmail
         );
 
         kafkaTemplate.send(TRANSACTION_COMPLETED_TOPIC, transaction.getId(), completedEvent);
@@ -209,6 +229,48 @@ public class TransactionService {
         }
 
         completeTransaction(transaction);
+    }
+
+    public AccountStatementResponse getAccountStatement(String accountNumber) {
+        Map<String, Object> account = accountServiceClient.getAccount(accountNumber);
+
+        List<TransactionResponse> transactions = transactionRepository
+                .findBySenderAccountNumberOrderByCreatedAtDesc(accountNumber)
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+
+        BigDecimal totalDebited = transactions.stream()
+                .filter(t -> t.getSenderAccountNumber().equals(accountNumber))
+                .filter(t -> t.getStatus() == TransactionStatus.COMPLETED)
+                .map(TransactionResponse::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal totalCredited = transactions.stream()
+                .filter(t -> t.getReceiverAccountNumber().equals(accountNumber))
+                .filter(t -> t.getStatus() == TransactionStatus.COMPLETED)
+                .map(TransactionResponse::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        int completed = (int) transactions.stream()
+                .filter(t -> t.getStatus() == TransactionStatus.COMPLETED).count();
+        int flagged = (int) transactions.stream()
+                .filter(t -> t.getStatus() == TransactionStatus.FLAGGED).count();
+
+        return new AccountStatementResponse(
+                accountNumber,
+                (String) account.get("accountHolderName"),
+                (String) account.get("email"),
+                (String) account.get("accountType"),
+                (BigDecimal) account.get("balance"),
+                totalDebited,
+                totalCredited,
+                transactions.size(),
+                completed,
+                flagged,
+                LocalDateTime.now(),
+                transactions
+        );
     }
 
 

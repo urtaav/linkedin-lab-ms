@@ -1,5 +1,6 @@
 package com.banking.paymentservice.service;
 
+import com.banking.paymentservice.client.AccountServiceClient;
 import com.banking.paymentservice.dto.CreatePaymentRequest;
 import com.banking.paymentservice.dto.PaymentOrderResponse;
 import com.banking.paymentservice.model.Payment;
@@ -27,6 +28,7 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final AccountServiceClient accountServiceClient;
 
     @Value("${razorpay.key-id}")
     private String keyId;
@@ -107,12 +109,16 @@ public class PaymentService {
             payment.setStatus(PaymentStatus.COMPLETED);
             paymentRepository.save(payment);
 
+            String accountEmail = accountServiceClient.getEmail(
+                    payment.getAccountNumber());
+
             // Publish payment completed event
             Map<String, Object> event = new HashMap<>();
             event.put("paymentId", payment.getId());
             event.put("accountNumber", payment.getAccountNumber());
             event.put("amount", payment.getAmount());
             event.put("razorpayPaymentId", paymentId);
+            event.put("email", accountEmail);
 
             kafkaTemplate.send(PAYMENT_COMPLETED_TOPIC,
                     payment.getId(), event);
@@ -137,12 +143,16 @@ public class PaymentService {
             payment.setFailureReason("Payment failed via Razorpay");
             paymentRepository.save(payment);
 
-            // Publish payment.failed event ← ADD THIS
+            String accountEmail = accountServiceClient.getEmail(
+                    payment.getAccountNumber());
+
+            // Publish payment.failed event
             Map<String, Object> event = new HashMap<>();
             event.put("paymentId", payment.getId());
             event.put("accountNumber", payment.getAccountNumber());
             event.put("amount", payment.getAmount());
             event.put("reason", "Payment failed via Razorpay");
+            event.put("email", accountEmail);
             kafkaTemplate.send("payment.failed", payment.getId(), event);
 
             log.warn("Payment failed: {}", payment.getId());

@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -27,8 +28,17 @@ public class AccountService {
     private static SecureRandom secureRandom = new SecureRandom();
 
 
+    public Optional<Account> findByEmail(String email) {
+        return accountRepository.findByEmail(email);
+    }
+
     @Transactional
     public AccountResponse createAccount(CreateAccountRequest request) {
+        return createAccount(request, null);
+    }
+
+    @Transactional
+    public AccountResponse createAccount(CreateAccountRequest request, String encodedPassword) {
         log.info("Creating account for: {}", request.getEmail());
 
         if (accountRepository.existsByEmail(request.getEmail())) {
@@ -39,6 +49,7 @@ public class AccountService {
         Account account = new Account();
         account.setAccountHolderName(request.getAccountHolderName());
         account.setEmail(request.getEmail());
+        account.setPassword(encodedPassword != null ? encodedPassword : "NO_PASSWORD");
         account.setPhone(request.getPhone());
         account.setAccountType(request.getAccountType());
         account.setStatus(AccountStatus.ACTIVE);
@@ -64,6 +75,10 @@ public class AccountService {
 
     public BigDecimal getBalance(String accountNumber) {
         return findByAccountNumber(accountNumber).getBalance();
+    }
+
+    public String getEmail(String accountNumber) {
+        return findByAccountNumber(accountNumber).getEmail();
     }
 
 

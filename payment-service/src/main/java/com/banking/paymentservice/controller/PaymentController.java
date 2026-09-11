@@ -4,6 +4,8 @@ import com.banking.paymentservice.dto.CreatePaymentRequest;
 import com.banking.paymentservice.dto.PaymentOrderResponse;
 import com.banking.paymentservice.service.PaymentService;
 import com.razorpay.RazorpayException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,11 +19,12 @@ import java.util.Map;
 @RequestMapping("/api/v1/payments")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "Payments", description = "Payment management endpoints (Razorpay)")
 public class PaymentController {
 
     private final PaymentService paymentService;
 
-    // Create Razorpay payment order
+    @Operation(summary = "Create a Razorpay payment order")
     @PostMapping("/create-order")
     public ResponseEntity<PaymentOrderResponse> createPaymentOrder(
             @Valid @RequestBody CreatePaymentRequest request)
@@ -30,7 +33,7 @@ public class PaymentController {
                 .body(paymentService.createPaymentOrder(request));
     }
 
-    // Razorpay webhook endpoint
+    @Operation(summary = "Handle Razorpay webhook callback")
     @PostMapping("/webhook")
     public ResponseEntity<String> handleWebhook(
             @RequestBody Map<String, Object> payload) {

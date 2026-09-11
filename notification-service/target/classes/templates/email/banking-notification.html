@@ -1,0 +1,207 @@
+html
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin:0;padding:0;background-color:#EEEEEE;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+
+<!-- Container -->
+<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#EEEEEE;padding:30px 0;">
+    <tr>
+        <td align="center">
+            <table width="600" cellpadding="0" cellspacing="0" style="background-color:#FFFFFF;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+
+                <!-- Header -->
+                <tr>
+                    <td style="background-color:#3483FA;padding:24px 32px;text-align:center;">
+                        <table width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="color:#FFFFFF;font-size:24px;font-weight:700;letter-spacing:0.5px;">
+                                    💳 DigitalBank
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="color:rgba(255,255,255,0.85);font-size:12px;padding-top:4px;letter-spacing:1px;text-transform:uppercase;">
+                                    Notificación de tu cuenta
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <!-- Alert Badge -->
+                <tr>
+                    <td style="padding:32px 32px 0;text-align:center;">
+                        <div th:if="${alertType == 'DEBIT'}" style="display:inline-block;background-color:#FF6B6B;color:#FFFFFF;padding:8px 20px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">
+                            🔻 Débito
+                        </div>
+                        <div th:if="${alertType == 'CREDIT'}" style="display:inline-block;background-color:#00A650;color:#FFFFFF;padding:8px 20px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">
+                            🔺 Crédito
+                        </div>
+                        <div th:if="${alertType == 'FRAUD'}" style="display:inline-block;background-color:#FF4444;color:#FFFFFF;padding:8px 20px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">
+                            🚨 Alerta de Seguridad
+                        </div>
+                        <div th:if="${alertType == 'OTP'}" style="display:inline-block;background-color:#FF9900;color:#FFFFFF;padding:8px 20px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">
+                            🔐 Verificación
+                        </div>
+                        <div th:if="${alertType == 'REFUND'}" style="display:inline-block;background-color:#00A650;color:#FFFFFF;padding:8px 20px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">
+                            💰 Reembolso
+                        </div>
+                        <div th:if="${alertType == 'PAYMENT_OK'}" style="display:inline-block;background-color:#00A650;color:#FFFFFF;padding:8px 20px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">
+                            ✅ Pago Exitoso
+                        </div>
+                        <div th:if="${alertType == 'PAYMENT_FAIL'}" style="display:inline-block;background-color:#FF4444;color:#FFFFFF;padding:8px 20px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">
+                            ❌ Pago Fallido
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- Title -->
+                <tr>
+                    <td style="padding:20px 32px 0;text-align:center;">
+                        <h1 style="margin:0;color:#333333;font-size:22px;font-weight:600;" th:text="${title}">
+                            Título de la notificación
+                        </h1>
+                    </td>
+                </tr>
+
+                <!-- Amount (big) -->
+                <tr th:if="${amount != null}">
+                    <td style="padding:16px 32px 0;text-align:center;">
+                        <div style="font-size:36px;font-weight:700;color:#333333;" th:text="${amount}">$1,500.00</div>
+                        <div style="font-size:13px;color:#999999;padding-top:4px;" th:text="${currency}">MXN</div>
+                    </td>
+                </tr>
+
+                <!-- Details Card -->
+                <tr>
+                    <td style="padding:24px 32px 0;">
+                        <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#F5F5F5;border-radius:8px;overflow:hidden;">
+                            <!-- Account -->
+                            <tr th:if="${accountNumber != null}">
+                                <td style="padding:14px 20px;border-bottom:1px solid #E0E0E0;">
+                                    <table width="100%" cellpadding="0" cellspacing="0">
+                                        <tr>
+                                            <td style="color:#666666;font-size:13px;font-weight:400;">Cuenta</td>
+                                            <td align="right" style="color:#333333;font-size:13px;font-weight:600;font-family:monospace;" th:text="${accountNumber}">
+                                                000123456789
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <!-- Sender/Receiver -->
+                            <tr th:if="${senderAccount != null}">
+                                <td style="padding:14px 20px;border-bottom:1px solid #E0E0E0;">
+                                    <table width="100%" cellpadding="0" cellspacing="0">
+                                        <tr>
+                                            <td style="color:#666666;font-size:13px;">Cuenta Origen</td>
+                                            <td align="right" style="color:#333333;font-size:13px;font-weight:600;font-family:monospace;" th:text="${senderAccount}">0001...</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr th:if="${receiverAccount != null}">
+                                <td style="padding:14px 20px;border-bottom:1px solid #E0E0E0;">
+                                    <table width="100%" cellpadding="0" cellspacing="0">
+                                        <tr>
+                                            <td style="color:#666666;font-size:13px;">Cuenta Destino</td>
+                                            <td align="right" style="color:#333333;font-size:13px;font-weight:600;font-family:monospace;" th:text="${receiverAccount}">0009...</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <!-- Date -->
+                            <tr>
+                                <td style="padding:14px 20px;border-bottom:1px solid #E0E0E0;">
+                                    <table width="100%" cellpadding="0" cellspacing="0">
+                                        <tr>
+                                            <td style="color:#666666;font-size:13px;">Fecha</td>
+                                            <td align="right" style="color:#333333;font-size:13px;font-weight:600;" th:text="${date}">23/07/2026 10:30</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <!-- Reference -->
+                            <tr th:if="${reference != null}">
+                                <td style="padding:14px 20px;">
+                                    <table width="100%" cellpadding="0" cellspacing="0">
+                                        <tr>
+                                            <td style="color:#666666;font-size:13px;">Referencia</td>
+                                            <td align="right" style="color:#333333;font-size:13px;font-weight:600;font-family:monospace;" th:text="${reference}">TXN-001</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <!-- OTP Section -->
+                <tr th:if="${otp != null}">
+                    <td style="padding:24px 32px 0;text-align:center;">
+                        <div style="background-color:#FFF3CD;border:2px dashed #FF9900;border-radius:8px;padding:20px;">
+                            <div style="color:#856404;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Tu código de verificación</div>
+                            <div style="font-size:32px;font-weight:800;color:#333333;letter-spacing:8px;font-family:monospace;" th:text="${otp}">123456</div>
+                            <div style="color:#856404;font-size:11px;margin-top:8px;">Válido por 5 minutos</div>
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- Reason (for fraud/refund) -->
+                <tr th:if="${reason != null}">
+                    <td style="padding:16px 32px 0;">
+                        <div style="background-color:#FFF3CD;border-left:4px solid #FF9900;padding:12px 16px;border-radius:0 4px 4px 0;">
+                            <div style="color:#856404;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Motivo</div>
+                            <div style="color:#856404;font-size:13px;padding-top:4px;" th:text="${reason}">Motivo de la alerta</div>
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- Message -->
+                <tr>
+                    <td style="padding:20px 32px;">
+                        <p style="margin:0;color:#666666;font-size:14px;line-height:1.6;" th:text="${message}">
+                            Descripción del evento.
+                        </p>
+                    </td>
+                </tr>
+
+                <!-- CTA Button -->
+                <tr th:if="${ctaUrl != null}">
+                    <td style="padding:0 32px 24px;text-align:center;">
+                        <a th:href="${ctaUrl}" style="display:inline-block;background-color:#3483FA;color:#FFFFFF;padding:14px 40px;border-radius:6px;text-decoration:none;font-size:14px;font-weight:600;letter-spacing:0.3px;">
+                            Ver detalles
+                        </a>
+                    </td>
+                </tr>
+
+                <!-- Divider -->
+                <tr>
+                    <td style="padding:0 32px;">
+                        <hr style="border:none;border-top:1px solid #E0E0E0;margin:0;">
+                    </td>
+                </tr>
+
+                <!-- Footer -->
+                <tr>
+                    <td style="padding:20px 32px 24px;text-align:center;">
+                        <p style="margin:0;color:#999999;font-size:11px;line-height:1.6;">
+                            Este es un correo automático, por favor no responder.<br>
+                            Si no reconoces esta actividad, contacta inmediatamente a soporte.
+                        </p>
+                        <p style="margin:12px 0 0;color:#BBBBBB;font-size:10px;">
+                            © 2026 DigitalBank — Todos los derechos reservados
+                        </p>
+                    </td>
+                </tr>
+
+            </table>
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>

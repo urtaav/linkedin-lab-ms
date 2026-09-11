@@ -1,6 +1,7 @@
 package com.banking.transactionservice.service;
 
 
+import com.banking.transactionservice.client.AccountServiceClient;
 import com.banking.transactionservice.model.Transaction;
 import com.banking.transactionservice.model.TransactionStatus;
 import com.banking.transactionservice.repository.TransactionRepository;
@@ -24,6 +25,7 @@ public class TransactionEventConsumer {
     private final TransactionRepository transactionRepository;
     private final RedisTemplate<String, String> redisTemplate;
     private final TransactionService transactionService;
+    private final AccountServiceClient accountServiceClient;
     private static final long OTP_EXPIRY_MINUTES = 5;
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
@@ -68,12 +70,15 @@ public class TransactionEventConsumer {
                     transactionId, OTP_EXPIRY_MINUTES);
 
             // Notify user
+            String accountEmail = accountServiceClient.getEmail(accountNumber);
+
             Map<String, Object> otpEvent = new HashMap<>();
             otpEvent.put("transactionId", transactionId);
             otpEvent.put("accountNumber", accountNumber);
             otpEvent.put("reason", reason);
             otpEvent.put("otp", otp);
             otpEvent.put("amount", payload.get("amount"));
+            otpEvent.put("email", accountEmail);
 
             kafkaTemplate.send(TRANSACTION_OTP_GENERATED_TOPIC, transactionId, otpEvent);
 

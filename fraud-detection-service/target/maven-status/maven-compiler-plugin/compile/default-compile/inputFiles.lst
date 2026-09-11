@@ -1,0 +1,7 @@
+C:\Users\uriel.tapia\Documents\DEV\springboot\2026\Digital-Banking-System-Microservices\fraud-detection-service\src\main\java\com\banking\frauddetectionservice\FraudDetectionServiceApplication.java
+C:\Users\uriel.tapia\Documents\DEV\springboot\2026\Digital-Banking-System-Microservices\fraud-detection-service\src\main\java\com\banking\frauddetectionservice\config\RedisConfig.java
+C:\Users\uriel.tapia\Documents\DEV\springboot\2026\Digital-Banking-System-Microservices\fraud-detection-service\src\main\java\com\banking\frauddetectionservice\client\AccountServiceClient.java
+C:\Users\uriel.tapia\Documents\DEV\springboot\2026\Digital-Banking-System-Microservices\fraud-detection-service\src\main\java\com\banking\frauddetectionservice\service\FraudDetectionService.java
+C:\Users\uriel.tapia\Documents\DEV\springboot\2026\Digital-Banking-System-Microservices\fraud-detection-service\src\main\java\com\banking\frauddetectionservice\config\OpenApiConfig.java
+C:\Users\uriel.tapia\Documents\DEV\springboot\2026\Digital-Banking-System-Microservices\fraud-detection-service\src\main\java\com\banking\frauddetectionservice\service\TransactionEventConsumer.java
+C:\Users\uriel.tapia\Documents\DEV\springboot\2026\Digital-Banking-System-Microservices\fraud-detection-service\src\main\java\com\banking\frauddetectionservice\model\FraudCheckResult.java

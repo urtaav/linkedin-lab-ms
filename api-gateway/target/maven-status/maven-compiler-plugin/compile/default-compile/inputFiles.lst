@@ -1,0 +1,5 @@
+C:\Users\uriel.tapia\Documents\DEV\springboot\2026\Digital-Banking-System-Microservices\api-gateway\src\main\java\com\banking\apigateway\filter\JwtAuthenticationFilter.java
+C:\Users\uriel.tapia\Documents\DEV\springboot\2026\Digital-Banking-System-Microservices\api-gateway\src\main\java\com\banking\apigateway\ApiGatewayApplication.java
+C:\Users\uriel.tapia\Documents\DEV\springboot\2026\Digital-Banking-System-Microservices\api-gateway\src\main\java\com\banking\apigateway\config\CorsConfig.java
+C:\Users\uriel.tapia\Documents\DEV\springboot\2026\Digital-Banking-System-Microservices\api-gateway\src\main\java\com\banking\apigateway\config\RateLimiterConfig.java
+C:\Users\uriel.tapia\Documents\DEV\springboot\2026\Digital-Banking-System-Microservices\api-gateway\src\main\java\com\banking\apigateway\config\OpenApiConfig.java
